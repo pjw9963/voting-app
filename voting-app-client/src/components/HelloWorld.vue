@@ -1,58 +1,82 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div>
+
+  <div v-if="loading">Loading...</div>
+  
+  <div v-else-if="error">Error: {{ error.message }}</div>
+
+  <template v-else-if="result && result.polls">
+    <div class="poll-container">
+      <template v-for="poll of result.polls" :key="poll.id">
+        <div class="poll">
+          <h4>{{ poll.title }}</h4>
+          <div class="option-container">
+            <template v-for="option of poll.options" :key="option.id">
+              <div>
+                <label>
+                  <input :name=" 'radio-group-' + poll.id " type="radio" />
+                  {{ option.text }}
+                </label>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+  </template>
+
   </div>
 </template>
 
 <script>
+import { useQuery } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
+
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
-  }
+  },
+  setup () {
+    const { result, loading, error } = useQuery(gql`      
+      query getUsers {
+        polls {
+          id
+          title
+          options {
+            id
+            text
+          }
+        }
+      }
+    `)
+
+    return {
+      result,
+      loading,
+      error,
+    }
+  },
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.poll-container {
+  display: flex;
+  justify-content: center;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+.poll {
+  border-radius: 10px;
+  background-color: #6bd8ff;
+  margin: 5px;
+  padding: 5px;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+
+.option-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 </style>

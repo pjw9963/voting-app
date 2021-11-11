@@ -1,6 +1,8 @@
 <template>
   <div>
 
+  <a href="http://localhost:4000/auth/github">Sign in with github</a>
+
   <div v-if="loading">Loading...</div>
   
   <div v-else-if="error">Error: {{ error.message }}</div>

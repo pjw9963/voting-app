@@ -1,6 +1,6 @@
 const typeDefs = /* GraphQL */ `
   type User {
-    id: Int!
+    id: ID!
     firstName: String
     lastName: String    
   }
@@ -22,11 +22,13 @@ const typeDefs = /* GraphQL */ `
   # the schema allows the following query:
   type Query {
     polls: [Poll]
+    currentUser: User
   }
 
   # this schema allows the following mutation:
   type Mutation {
     vote(pollId: Int!, optionId: Int!, userId: Int!): Poll
+    logout: Boolean
   }
 `;
 

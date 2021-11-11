@@ -1,12 +1,6 @@
 import pkg from 'lodash';
 const { find, filter, includes } = pkg;
-
-// example data
-const users = [
-    { id: 1, firstName: 'Tom', lastName: 'Coleman' },
-    { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-    { id: 3, firstName: 'Mikhail', lastName: 'Novikov' },
-];
+import userRepo from '../repos/userRepo.js';
 
 const options = [
     { id: 1, text: 'REST' },
@@ -41,16 +35,18 @@ const pollOptions = [
 
 const resolvers = {
     Query: {
+        currentUser: (parent, args, context) => context.getUser(),
         polls: () => polls,
     },
 
     Mutation: {
+        logout: (parent, args, context) => context.logout(),
         vote: (_, { pollId, optionId, userId }) => {
             const option = find(options, { id: optionId });
             if (!option) {
                 throw new Error(`Couldn't find option with id ${optionId}`);
             }
-            const user = find(users, { id: userId });
+            const user = userRepo.getUserById(userId);
             if (!user) {
                 throw new Error(`Couldn't find user with id ${userId}`)
             }
@@ -67,7 +63,7 @@ const resolvers = {
         voters: option => {
             let optionVotes = filter(votes, { optionId: option.id })
             let validVoters = optionVotes.map((i) => i.userId)
-            let result = users.filter(user => validVoters.includes(user.id))
+            let result = userRepo.getUsers().filter(user => validVoters.includes(user.id))
             return result
         },
     },
